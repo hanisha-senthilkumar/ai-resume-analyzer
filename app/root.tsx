@@ -21,15 +21,24 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Inter:wght@300;400;500;600;700;800&display=swap",
   },
 ];
+
+import { ToastProvider } from "~/components/Toast";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { init } = usePuterStore();
 
   useEffect(() => {
-    init()
+    init();
+    // Initialize dark mode class on mount if saved
+    if (typeof window !== "undefined") {
+      const savedTheme = localStorage.getItem("resumind-theme");
+      if (savedTheme === "dark" || (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+    }
   }, [init]);
 
   return (
@@ -40,9 +49,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-slate-100 transition-colors duration-200">
         <script src="https://js.puter.com/v2/"></script>
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
